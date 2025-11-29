@@ -19,6 +19,7 @@ class Starter
     {
         add_action("wp_enqueue_scripts", [$this, 'enqueue_scripts']);
         add_action('show_bk_form', [$this, 'show_bk_form_fn']);
+        register_activation_hook(__FILE__, [$this, 'create_table']);
     }
 
     function enqueue_scripts()
@@ -50,8 +51,28 @@ class Starter
         }
     }
 
-    function create_table() {}
+    function create_table()
+    {
+        global $wpdb;
+
+        $table_prifix = $wpdb->prefix;
+        $table_name = $table_prifix . 'bk_contact_form';
+        $charset_collate = $wpdb->get_charset_collate();
+        $sql = "CREATE TABLE $table_name (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    subject VARCHAR(150) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)";
+
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        dbDelta($sql);
+    }
 }
 
 
-new Starter();
+$starter = new Starter();
+
+$starter->create_table();
