@@ -15,11 +15,14 @@ if (!defined('ABSPATH')) {
 
 class Starter
 {
+
     function __construct()
     {
         add_action("wp_enqueue_scripts", [$this, 'enqueue_scripts']);
         add_action('show_bk_form', [$this, 'show_bk_form_fn']);
         register_activation_hook(__FILE__, [$this, 'create_table']);
+
+        add_action('wp_loaded', [$this, 'form_process']);
     }
 
     function enqueue_scripts()
@@ -30,7 +33,6 @@ class Starter
     function show_bk_form_fn()
     {
         include(plugin_dir_path(__FILE__) . '/template/form-markup.php');
-        $this->form_process();
     }
 
     function form_process()
@@ -46,7 +48,27 @@ class Starter
                 $subject = sanitize_text_field($_POST['subject'] ?? '');
                 $message = sanitize_textarea_field($_POST['message'] ?? '');
 
-                echo '<pre>' . print_r(compact('name', 'email', 'subject', 'message'), true) . '</pre>';
+                $data_arr = array(
+                    'name' => $name,
+                    'email' => $email,
+                    'subject' => $subject,
+                    'message' => $message
+                );
+
+                global $wpdb;
+                $table_prifix = $wpdb->prefix;
+                $table_name = $table_prifix . 'bk_contact_form';
+
+                $contact_insert = $wpdb->insert($table_name, $data_arr);
+
+                $redirect_url = add_query_arg(
+                    [
+                        'bk_form_status' => $contact_insert ? "Success" : "Faild"
+                    ],
+                    wp_get_referer()
+                );
+                wp_redirect($redirect_url);
+                exit;
             }
         }
     }
