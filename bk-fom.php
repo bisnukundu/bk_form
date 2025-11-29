@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Bk-Form
  * Version: 1.0.0
- * Description: This is simple contact form.
+ * Description: This is simple contact form. To use this form use this shortcode anywhere [bk_contact_form] in the page.
  * Author: Bisnu Kunu
  * Author URI: bisnukundu.netlify.app
  * 
