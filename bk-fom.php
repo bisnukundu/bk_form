@@ -28,7 +28,6 @@ class Starter
 
     function show_bk_form_fn()
     {
-        wp_nonce_field('bk_form_nonce', 'bk_nonce');
         include(plugin_dir_path(__FILE__) . '/template/form-markup.php');
         $this->form_process();
     }
@@ -36,17 +35,22 @@ class Starter
     function form_process()
     {
 
-        $submit_btn = $_POST['bk_form_submit_btn'] ?? '';
+        if (isset($_POST['bk_form_submit_btn'])) {
+            if (!wp_verify_nonce($_POST['bk_ct_form_nonce'], 'bk_contact_form')) {
+                print "Sorry, Your nonce is invalid";
+                exit;
+            } else {
+                $name = sanitize_text_field($_POST['name'] ?? '');
+                $email = sanitize_email($_POST['email'] ?? '');
+                $subject = sanitize_text_field($_POST['subject'] ?? '');
+                $message = sanitize_textarea_field($_POST['message'] ?? '');
 
-        if (isset($submit_btn)) {
-            $name = sanitize_text_field($_POST['name'] ?? '');
-            $email = sanitize_email($_POST['email'] ?? '');
-            $subject = sanitize_text_field($_POST['subject'] ?? '');
-            $message = sanitize_textarea_field($_POST['message'] ?? '');
-
-             echo '<pre>' . print_r(compact('name', 'email', 'subject', 'message'), true) . '</pre>';
+                echo '<pre>' . print_r(compact('name', 'email', 'subject', 'message'), true) . '</pre>';
+            }
         }
     }
+
+    function create_table() {}
 }
 
 

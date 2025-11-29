@@ -1,8 +1,8 @@
 <div class="p-4 mx-auto max-w-xl bg-white">
   <h2 class="text-3xl text-slate-900 font-bold">Contact us</h2>
-  <form class="mt-8 space-y-5" method="POST" action="">
-    <input type="hidden" name="bk_nonce" value="">
-    <div>
+  <form class="mt-8 space-y-5" method="POST" action="/">
+  <?php echo wp_nonce_field('bk_contact_form','bk_ct_form_nonce') ?>
+  <div>
       <label class='text-sm text-slate-900 font-medium mb-2 block'>Name</label>
       <input name="name" type='text' placeholder='Enter Name'
         class="w-full py-2.5 px-4 text-slate-800 bg-gray-100 border border-gray-200 focus:border-slate-900 focus:bg-transparent text-sm outline-0 transition-all" />
