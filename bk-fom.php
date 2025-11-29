@@ -58,13 +58,20 @@ class Starter
                 global $wpdb;
                 $table_prifix = $wpdb->prefix;
                 $table_name = $table_prifix . 'bk_contact_form';
+                $status_msg_arr = array();
 
-                $contact_insert = $wpdb->insert($table_name, $data_arr);
+
+                if (!empty($name) && !empty($email) && !empty($subject) && !empty($message)) {
+
+                    $contact_insert = $wpdb->insert($table_name, $data_arr);
+                    array_push($status_msg_arr, ['bk_form_status' => $contact_insert ? "Success" : "Faild"]);
+                } else {
+                    array_push($status_msg_arr, ['bk_form_status' => "all field required"]);
+                }
+
 
                 $redirect_url = add_query_arg(
-                    [
-                        'bk_form_status' => $contact_insert ? "Success" : "Faild"
-                    ],
+                    $status_msg_arr,
                     wp_get_referer()
                 );
                 wp_redirect($redirect_url);
