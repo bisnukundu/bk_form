@@ -23,6 +23,7 @@ class Starter
         register_activation_hook(__FILE__, [$this, 'create_table']);
 
         add_action('wp_loaded', [$this, 'form_process']);
+        add_shortcode("bk_contact_form", [$this, 'show_bk_form_fn_for_shortcode']);
     }
 
     function enqueue_scripts()
@@ -32,7 +33,22 @@ class Starter
 
     function show_bk_form_fn()
     {
+        
+        ob_start(); 
         include(plugin_dir_path(__FILE__) . '/template/form-markup.php');
+        echo ob_get_clean(); 
+
+
+    }
+
+      function show_bk_form_fn_for_shortcode()
+    {
+        
+        ob_start(); 
+        include(plugin_dir_path(__FILE__) . '/template/form-markup.php');
+        return ob_get_clean(); 
+
+
     }
 
     function form_process()
