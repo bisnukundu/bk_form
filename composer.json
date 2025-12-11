@@ -1,0 +1,15 @@
+{
+    "name": "bisnukundu/bk-form",
+    "description": "This is contact form plugin for wordpress",
+    "autoload": {
+        "psr-4": {
+            "BkForm\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Bishnu Kundu"
+        }
+    ],
+    "require": {}
+}
