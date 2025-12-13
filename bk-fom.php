@@ -25,6 +25,7 @@ if (file_exists(BK_FORM_PATH . '/vendor/autoload.php')) {
     die("Autoload.php not found");
 }
 
+use BkForm\Admin\Controller\ContactsList;
 use BkForm\Core\Installer;
 use BkForm\Frontend\Controller\ContactForm;
 
@@ -67,3 +68,5 @@ $starter = new Starter();
 
 
 new ContactForm();
+
+new ContactsList();
