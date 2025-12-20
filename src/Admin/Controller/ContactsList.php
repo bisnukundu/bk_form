@@ -2,29 +2,80 @@
 
 namespace BkForm\Admin\Controller;
 
+if (!class_exists('WP_List_Table')) {
+    require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
+}
 
-class ContactsList
+use WP_List_Table;
+
+class ContactsList extends WP_List_Table
 {
+
+    private $table_data;
 
     function __construct()
     {
-        add_action("admin_menu", [$this, 'create_menu']);
+        parent::__construct(array(
+            'singular' => 'contact', // Singular label (e.g., "Contact")
+            'plural'   => 'contacts', // Plural label (e.g., "Contacts")
+            'ajax'     => false       // Does this table support AJAX?
+        ));
     }
 
-    function view()
+    function get_columns()
+    {
+        $columns = array(
+            'cb'    => "<input type='checkbox' />",
+            'name' => __('Name'),
+            'email' => __('Email'),
+            'subject' => __('Subject'),
+
+        );
+
+        return $columns;
+    }
+
+    function prepare_items()
+    {
+        $this->table_data = $this->get_table_data();
+
+        $columns = $this->get_columns();
+        $hidden = array();
+        $sortable = array();
+
+        $this->items = $this->table_data;
+        $this->_column_headers = array(
+            $columns,
+            $hidden,
+            $sortable
+        );
+    }
+
+    // our custom method for getting data form database table 
+    function get_table_data()
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . "bk_contact_form";
-        $query = "SELECT * FROM $table_name";
-        $results = $wpdb->get_results($query);
 
-        ob_start();
-        include(BK_FORM_PATH . '/src/Admin/View/ContactsList.php');
-        echo ob_get_clean();
+        $table_name = $wpdb->prefix . 'bk_contact_form';
+        $contactQuery = "SELECT * FROM $table_name";
+        $contactsData = $wpdb->get_results($contactQuery, ARRAY_A);
+        return is_array($contactsData) ? $contactsData : [];
     }
 
-    function create_menu()
+    function column_default($item, $column_name)
     {
-        add_menu_page("Contacts", "Contacts", 'manage_options', 'bk-contacts', [$this, 'view'], '', 3);
+        return $item[$column_name];
+    }
+
+    function column_email($item)
+    {
+        $modify_email = "<a href='mailto:" . sanitize_email($item['email']) . "'>" . $item["email"] . "</a>";
+        return $modify_email;
+    }
+
+
+    function column_cb($item)
+    {
+        return sprintf('<input type="checkbox" name="element[]" value="%s" />', $item['id']);
     }
 }
