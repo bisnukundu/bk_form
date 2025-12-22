@@ -13,14 +13,6 @@ class ContactsList extends WP_List_Table
 
     private $table_data;
 
-    function __construct()
-    {
-        parent::__construct(array(
-            'singular' => 'contact', // Singular label (e.g., "Contact")
-            'plural'   => 'contacts', // Plural label (e.g., "Contacts")
-            'ajax'     => false       // Does this table support AJAX?
-        ));
-    }
 
     function get_columns()
     {
@@ -35,15 +27,25 @@ class ContactsList extends WP_List_Table
         return $columns;
     }
 
+    function get_sortable_columns()
+    {
+        $sortable_columns = array(
+            'name'  =>  array('name', true),
+            'email' => array('email', false),
+        );
+        return $sortable_columns;
+    }
+
     function prepare_items()
     {
         $this->table_data = $this->get_table_data();
 
         $columns = $this->get_columns();
         $hidden = array();
-        $sortable = array();
+        $sortable = $this->get_sortable_columns();
 
         $this->items = $this->table_data;
+
         $this->_column_headers = array(
             $columns,
             $hidden,
@@ -56,8 +58,12 @@ class ContactsList extends WP_List_Table
     {
         global $wpdb;
 
+        // These are getting form url peramiter for sorting.
+        $order = !empty($_GET['order']) ? sanitize_text_field($_GET['order']) : 'asc';
+        $orderBy = !empty($_GET['orderby']) ? sanitize_text_field($_GET['orderby']) : 'id';
+
         $table_name = $wpdb->prefix . 'bk_contact_form';
-        $contactQuery = "SELECT * FROM $table_name";
+        $contactQuery = "SELECT * FROM $table_name ORDER BY $orderBy $order";
         $contactsData = $wpdb->get_results($contactQuery, ARRAY_A);
         return is_array($contactsData) ? $contactsData : [];
     }
