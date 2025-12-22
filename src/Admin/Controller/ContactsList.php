@@ -57,14 +57,32 @@ class ContactsList extends WP_List_Table
     function get_table_data()
     {
         global $wpdb;
+        $table_name = $wpdb->prefix . 'bk_contact_form';
+
+        //Pagination        
+        // Calculate pagination details
+        $per_page = 20;
+        $current_page = $this->get_pagenum();
+        $offset = ($current_page - 1) * $per_page;
+
+        // Count total items first (for pagination calculation)
+        $total_items_query = "SELECT COUNT(*) FROM $table_name";
+        $total_items = $wpdb->get_var($total_items_query);
 
         // These are getting form url peramiter for sorting.
         $order = !empty($_GET['order']) ? sanitize_text_field($_GET['order']) : 'asc';
         $orderBy = !empty($_GET['orderby']) ? sanitize_text_field($_GET['orderby']) : 'id';
 
-        $table_name = $wpdb->prefix . 'bk_contact_form';
-        $contactQuery = "SELECT * FROM $table_name ORDER BY $orderBy $order";
-        $contactsData = $wpdb->get_results($contactQuery, ARRAY_A);
+
+        $contactQuery = "SELECT * FROM $table_name ORDER BY $orderBy $order LIMIT %d OFFSET %d";
+        $contactsData = $wpdb->get_results($wpdb->prepare($contactQuery, $per_page, $offset), ARRAY_A);
+
+        $this->set_pagination_args(array(
+            'total_items' => $total_items, // The total number of items
+            'per_page'    => $per_page,    // The number of items per page
+            'total_pages' => ceil($total_items / $per_page) // Calculate total pages
+        ));
+
         return is_array($contactsData) ? $contactsData : [];
     }
 
