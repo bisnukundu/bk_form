@@ -14,10 +14,17 @@ class ContactMenu
 
     function view()
     {
+
+
         $contactTable = new ContactsList();
 
         $contactTable->prepare_items();
+
+        echo "<form method='GET'>";
+        echo "<input type='hidden' name='page' value='" . $_REQUEST['page'] . "' /?>";
+        $contactTable->search_box("Contact Search", "contact_search");
         $contactTable->display();
+        echo "</form>";
     }
 
     function create_menu()

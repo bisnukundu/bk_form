@@ -59,19 +59,22 @@ class ContactsList extends WP_List_Table
         global $wpdb;
         $table_name = $wpdb->prefix . 'bk_contact_form';
 
-        //Pagination        
+        //Pagination Start     
         // Calculate pagination details
-        $per_page = 20;
+        $per_page = $this->get_items_per_page('contacts_per_page', 20);
         $current_page = $this->get_pagenum();
         $offset = ($current_page - 1) * $per_page;
 
         // Count total items first (for pagination calculation)
         $total_items_query = "SELECT COUNT(*) FROM $table_name";
         $total_items = $wpdb->get_var($total_items_query);
+        //Pagination End
 
+        //Order Start
         // These are getting form url peramiter for sorting.
         $order = !empty($_GET['order']) ? sanitize_text_field($_GET['order']) : 'asc';
         $orderBy = !empty($_GET['orderby']) ? sanitize_text_field($_GET['orderby']) : 'id';
+        //Order End
 
 
         $contactQuery = "SELECT * FROM $table_name ORDER BY $orderBy $order LIMIT %d OFFSET %d";
