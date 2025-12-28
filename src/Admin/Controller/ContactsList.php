@@ -96,10 +96,17 @@ class ContactsList extends WP_List_Table
 
     function column_name($item)
     {
+        $contact_id = $item['id'];
         $actions = array(
             // 'action_slug' => 'HTML Link'
-            "edit"  => "<a href=''>EDIT</a>",
-            'delete' => "<a href=''>Delete</a>",
+            "edit"  => sprintf(
+                "<a href='%s'>EDIT</a>",
+                esc_url(add_query_arg(array('action' => 'edit_contact', 'contact_id' => $contact_id))),
+            ),
+            'delete' => sprintf(
+                "<a href='%s'>Delete</a>",
+                esc_url(add_query_arg(array('action' => 'delete_contact', 'contact_id' => $contact_id))),
+            ),
         );
 
         return esc_html($item['name']) . $this->row_actions($actions);
