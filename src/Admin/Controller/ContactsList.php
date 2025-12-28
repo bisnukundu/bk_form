@@ -91,8 +91,20 @@ class ContactsList extends WP_List_Table
 
     function column_default($item, $column_name)
     {
-        return $item[$column_name];
+        return esc_html($item[$column_name]);
     }
+
+    function column_name($item)
+    {
+        $actions = array(
+            // 'action_slug' => 'HTML Link'
+            "edit"  => "<a href=''>EDIT</a>",
+            'delete' => "<a href=''>Delete</a>",
+        );
+
+        return esc_html($item['name']) . $this->row_actions($actions);
+    }
+
 
     function column_email($item)
     {
