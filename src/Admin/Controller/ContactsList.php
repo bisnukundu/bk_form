@@ -27,6 +27,17 @@ class ContactsList extends WP_List_Table
         return $columns;
     }
 
+    function get_bulk_actions()
+    {
+        $actions = [
+            "delete_contact" => __('Delete'),
+            'sent_mail_contact' => __('Send Email'),
+        ];
+        return $actions;
+    }
+
+
+
     function get_sortable_columns()
     {
         $sortable_columns = array(
@@ -38,6 +49,7 @@ class ContactsList extends WP_List_Table
 
     function prepare_items()
     {
+
         $this->table_data = $this->get_table_data();
 
         $columns = $this->get_columns();
@@ -61,7 +73,7 @@ class ContactsList extends WP_List_Table
 
         //Pagination Start     
         // Calculate pagination details
-        $per_page = $this->get_items_per_page('contacts_per_page', 20);
+        $per_page = $this->get_items_per_page('contacts_per_page', 10);
         $current_page = $this->get_pagenum();
         $offset = ($current_page - 1) * $per_page;
 
@@ -76,9 +88,16 @@ class ContactsList extends WP_List_Table
         $orderBy = !empty($_GET['orderby']) ? sanitize_text_field($_GET['orderby']) : 'id';
         //Order End
 
+        // Get Search Text 
+        $search_value = isset($_REQUEST['s']) ? sanitize_text_field($_REQUEST['s']) : '';
 
-        $contactQuery = "SELECT * FROM $table_name ORDER BY $orderBy $order LIMIT %d OFFSET %d";
-        $contactsData = $wpdb->get_results($wpdb->prepare($contactQuery, $per_page, $offset), ARRAY_A);
+        if (!empty($search_value)) {
+            $contactQuery = "SELECT * FROM $table_name WHERE name LIKE %s ORDER BY $orderBy $order LIMIT %d OFFSET %d";
+            $contactsData = $wpdb->get_results($wpdb->prepare($contactQuery, "%" . $search_value . "%", $per_page, $offset), ARRAY_A);
+        } else {
+            $contactQuery = "SELECT * FROM $table_name ORDER BY $orderBy $order LIMIT %d OFFSET %d";
+            $contactsData = $wpdb->get_results($wpdb->prepare($contactQuery, $per_page, $offset), ARRAY_A);
+        }
 
         $this->set_pagination_args(array(
             'total_items' => $total_items, // The total number of items
@@ -122,6 +141,6 @@ class ContactsList extends WP_List_Table
 
     function column_cb($item)
     {
-        return sprintf('<input type="checkbox" name="element[]" value="%s" />', $item['id']);
+        return sprintf('<input type="checkbox" name="contact_ids[]" value="%s" />', $item['id']);
     }
 }

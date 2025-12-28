@@ -17,6 +17,7 @@ class ContactMenu
     {
         add_action("admin_menu", [$this, 'create_menu']);
         add_action("admin_init", [$this, 'handle_actions']);
+        add_action("admin_init", [$this, 'process_bulk_action']);
         add_action('admin_notices', [$this, 'show_admin_notices']);
     }
 
@@ -70,11 +71,67 @@ class ContactMenu
         $this->successNotice("Contact deleted successfully.", 'deleted');
         // Check for delete error message (optional)
         $this->errorNotice("Error: Could not delete the contact", "error");
+
+
+        //bulk deleting notice
+        $deleted_row_count = isset($_REQUEST['bulk_deleted_count']) ? $_REQUEST['bulk_deleted_count'] : 0;
+        $this->successNotice("$deleted_row_count Contacts Delete Successfully", 'bulk_deleted');
+        $this->errorNotice("Error: Could not delete the contact", "bulk_delete_error");
+    }
+
+    // Bulk Actions Handler
+
+    function process_bulk_action()
+    {
+        $current_action = false;
+
+        if (isset($_REQUEST['action']) && -1 != $_REQUEST['action']) {
+            $current_action = sanitize_text_field($_REQUEST['action']);
+        } elseif (isset($_REQUEST['action2']) && -1 != $_REQUEST['action2']) {
+            $current_action = sanitize_text_field($_REQUEST['action2']);
+        }
+
+        if ($current_action) {
+            global $wpdb;
+            $table_name = $wpdb->prefix . 'bk_contact_form';
+            $contact_ids = isset($_REQUEST['contact_ids']) ? array_map('intval', $_REQUEST['contact_ids']) : array();
+            $query_placeholder = implode(", ", array_fill(0, count($contact_ids), '%d'));
+            switch ($current_action) {
+                case "delete_contact":
+                    $delete_query = "DELETE FROM $table_name WHERE id IN ($query_placeholder)";
+                    $prepare_query = $wpdb->prepare($delete_query, $contact_ids);
+                    $result = $wpdb->query($prepare_query);
+                    if ($result) {
+                        $redirect = add_query_arg(
+                            [
+                                'bulk_deleted_count' => count($contact_ids),
+                                'page' => $_REQUEST['page'],
+                                'bulk_deleted' => 'true'
+                            ],
+                            admin_url('admin.php')
+                        );
+                    } else {
+                        $redirect = add_query_arg(
+                            array(
+                                'bulk_delete_error' => 'true',
+                                'page' => $_REQUEST['page']
+                            ),
+                            admin_url('admin.php')
+                        );
+                    }
+                    wp_redirect($redirect);
+                    exit;
+                case "sent_mail_contact":
+                    die("sent mail contact");
+                    exit;
+            }
+        }
     }
 
 
     function view()
     {
+
 
         $contactTable = new ContactsList();
 

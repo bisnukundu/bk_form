@@ -20,4 +20,5 @@ function contact_delete($contact_id)
 function contact_update($contact_id) {}
 function contact_view($contact_id) {}
 
-?>
+
+
