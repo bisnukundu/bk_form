@@ -113,11 +113,18 @@ class ContactsList extends WP_List_Table
         return esc_html($item[$column_name]);
     }
 
+
+
     function column_name($item)
     {
         $contact_id = $item['id'];
+
+        // Creating custom slug
+        $name_for_slug = str_replace(' ', '_', strtolower($item['name']));
+
         $actions = array(
             // 'action_slug' => 'HTML Link'
+            'view' => sprintf("<a href='%s'> View </a>", home_url('/view-contact/' . $name_for_slug . '/')),
             "edit"  => sprintf(
                 "<a href='%s'>EDIT</a>",
                 esc_url(add_query_arg(array('action' => 'edit_contact', 'contact_id' => $contact_id))),

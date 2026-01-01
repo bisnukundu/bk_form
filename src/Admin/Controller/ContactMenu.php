@@ -19,6 +19,53 @@ class ContactMenu
         add_action("admin_init", [$this, 'handle_actions']);
         add_action("admin_init", [$this, 'process_bulk_action']);
         add_action('admin_notices', [$this, 'show_admin_notices']);
+        add_filter('query_vars', [$this, 'add_contact_slug_query_var']);
+        add_action('init', [$this, 'add_contact_rewrite_rule']);
+        add_action('template_redirect', [$this, 'view_contact_content']);
+    }
+
+    function view_contact_content()
+    {
+        $contact_slug = get_query_var('view_contact_slug');
+        global $bk_contact_data;
+        global $wpdb;
+
+        $slug_to_contact_name = str_replace('_', ' ', $contact_slug);
+
+
+
+        $contact_table = $wpdb->prefix . 'bk_contact_form';
+
+        $query_to_get_single_contact = "SELECT * FROM $contact_table WHERE name=%s LIMIT %d";
+
+        // Fetching single row 
+        $result = $wpdb->get_row($wpdb->prepare($query_to_get_single_contact, [sanitize_text_field(ucwords($slug_to_contact_name)), 1]), ARRAY_A);
+
+        $bk_contact_data =  $result;
+
+        if (!empty($contact_slug)) {
+            global $bk_contact_data;
+
+            include BK_FORM_PATH . '/src/Frontend/View/ViewSingleContact.php';
+            exit;
+        }
+    }
+
+    function add_contact_rewrite_rule()
+    {
+        // Add rewrite rule: match 'view-contact/anything/' and map it to the query var
+        add_rewrite_rule(
+            '^view-contact/([^/]+)/?$', // Regex pattern: matches 'view-contact/', captures slug, optional trailing slash
+            'index.php?view_contact_slug=$matches[1]', // Query string to use internally
+            'top' // Priority
+        );
+    }
+
+    //Custom Slug Register 
+    function add_contact_slug_query_var($vars)
+    {
+        $vars[] = 'view_contact_slug';
+        return $vars;
     }
 
     public function handle_actions()
