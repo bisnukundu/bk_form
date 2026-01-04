@@ -124,10 +124,10 @@ class ContactsList extends WP_List_Table
 
         $actions = array(
             // 'action_slug' => 'HTML Link'
-            'view' => sprintf("<a href='%s'> View </a>", home_url('/view-contact/' . $name_for_slug . '/')),
+            'view' => sprintf("<a target='blank' href='%s'> View </a>", home_url('/view-contact/' . $name_for_slug . '/')),
             "edit"  => sprintf(
                 "<a href='%s'>EDIT</a>",
-                esc_url(add_query_arg(array('action' => 'edit_contact', 'contact_id' => $contact_id))),
+                esc_url(add_query_arg(array('page' => 'edit-bk-contact', 'contact_id' => $contact_id))),
             ),
             'delete' => sprintf(
                 "<a href='%s'>Delete</a>",

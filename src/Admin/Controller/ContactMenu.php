@@ -24,6 +24,7 @@ class ContactMenu
         add_action('template_redirect', [$this, 'view_contact_content']);
     }
 
+    // Single contact view details disply 
     function view_contact_content()
     {
         $contact_slug = get_query_var('view_contact_slug');
@@ -183,11 +184,13 @@ class ContactMenu
         $contactTable = new ContactsList();
 
         $contactTable->prepare_items();
+        echo "<div class='wrap'>";
         echo "<form method='GET'>";
         echo "<input type='hidden' name='page' value='" . esc_attr($_REQUEST['page']) . "' />";
         $contactTable->search_box("Contact Search", "contact_search");
         $contactTable->display();
         echo "</form>";
+        echo "<div>";
     }
 
 
@@ -195,5 +198,37 @@ class ContactMenu
     function create_menu()
     {
         add_menu_page("Contacts", "Contacts", 'manage_options', 'bk-contacts', [$this, 'view'], 'dashicons-email-alt', 3);
+        add_submenu_page(
+            ' ', //Set empty to hide this menu from contact menus.
+            'Edit Contact',
+            'Edit Contact',
+            'manage_options',
+            'edit-bk-contact',
+            [$this, 'edit_bk_contact']
+        );
+    }
+
+    function edit_bk_contact()
+    {
+        global $wpdb;
+        $get_contact_id = $_REQUEST['contact_id'];
+        $table_name = BK_CONTACT_TABLE_NAME;
+        $contact_query = $wpdb->prepare("SELECT * FROM $table_name WHERE id=%d", $get_contact_id);
+
+        $contact = $wpdb->get_row($contact_query);
+
+
+        ob_start();
+        include BK_FORM_PATH . 'src/Admin/View/EditContact.php';
+        echo ob_get_clean();
+
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_REQUEST['update_contact'])) {
+            if (!wp_verify_nonce('edit_bk_contact', 'edit_bk_contact_' . $contact->id)) {
+                wp_die("Security check faild");
+            }
+
+            //Sanitize input field;
+        }
     }
 }

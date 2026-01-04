@@ -12,6 +12,14 @@
 if (!defined('ABSPATH')) {
     die('We\'re sorry, but you can not directly access this file.');
 }
+
+if (!defined('BK_CONTACT_TABLE_NAME')) {
+    global $wpdb;
+    $tableName = $wpdb->prefix . "bk_contact_form";
+    
+    define("BK_CONTACT_TABLE_NAME", $tableName);
+}
+
 if (!defined('BK_FORM_PATH')) {
     define("BK_FORM_PATH", plugin_dir_path(__FILE__));
 }
