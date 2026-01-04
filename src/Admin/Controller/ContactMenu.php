@@ -22,6 +22,7 @@ class ContactMenu
         add_filter('query_vars', [$this, 'add_contact_slug_query_var']);
         add_action('init', [$this, 'add_contact_rewrite_rule']);
         add_action('template_redirect', [$this, 'view_contact_content']);
+        add_action('admin_init', [$this, 'handle_edit_logic']);
     }
 
     // Single contact view details disply 
@@ -208,27 +209,69 @@ class ContactMenu
         );
     }
 
+    function handle_edit_logic()
+    {
+        global $wpdb;
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_REQUEST['update_contact'])) {
+            $contact_id = absint($_REQUEST['contact_id']);
+
+            if (!wp_verify_nonce($_REQUEST['edit_bk_contact'], 'edit_bk_contact_' . $contact_id)) {
+                wp_die("Security check faild");
+                exit;
+            }
+            $table_name = BK_CONTACT_TABLE_NAME;
+            //Sanitize input field;
+
+            $name = sanitize_text_field($_REQUEST['name']);
+            $message = sanitize_textarea_field($_REQUEST['message']);
+            $subject = sanitize_text_field($_REQUEST['subject']);
+            $email = sanitize_email($_REQUEST['email']);
+
+
+            $contact_updated = $wpdb->update(
+                $table_name,
+                [
+                    'name' => $name,
+                    'email' => $email,
+                    'message' => $message,
+                    'subject' => $subject,
+                ],
+                [
+                    'id' => $contact_id
+                ],
+                [
+                    '%s',
+                    '%s',
+                    '%s',
+                    '%s',
+                ],
+                [
+                    '%d'
+                ]
+            );
+
+            if ($contact_updated) {
+                wp_redirect(add_query_arg(['page' => 'bk-contacts'], admin_url('admin.php')));
+                return;
+                exit;
+            }
+        }
+    }
+
     function edit_bk_contact()
     {
         global $wpdb;
-        $get_contact_id = $_REQUEST['contact_id'];
+        $get_contact_id = absint($_REQUEST['contact_id']);
         $table_name = BK_CONTACT_TABLE_NAME;
         $contact_query = $wpdb->prepare("SELECT * FROM $table_name WHERE id=%d", $get_contact_id);
 
         $contact = $wpdb->get_row($contact_query);
 
 
+
         ob_start();
         include BK_FORM_PATH . 'src/Admin/View/EditContact.php';
         echo ob_get_clean();
-
-
-        if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_REQUEST['update_contact'])) {
-            if (!wp_verify_nonce('edit_bk_contact', 'edit_bk_contact_' . $contact->id)) {
-                wp_die("Security check faild");
-            }
-
-            //Sanitize input field;
-        }
     }
 }

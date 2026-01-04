@@ -9,6 +9,9 @@
 
 <form method="POST">
     <?php wp_nonce_field('edit_bk_contact_' . $contact->id, 'edit_bk_contact') ?>
+
+    <input type="hidden" value="<?php echo $contact->id;?>" name="contact_id">
+
     <label for="name">Name: </label>
     <input type="text" name="name" value="<?php echo esc_attr($contact->name); ?>">
     <br>
