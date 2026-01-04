@@ -4,7 +4,7 @@ function contact_delete($contact_id)
 {
     global $wpdb;
 
-    $table_name = $wpdb->prefix . 'bk_contact_form';
+    $table_name = BK_CONTACT_TABLE_NAME;
 
     $contact_deleted = $wpdb->delete(
         $table_name,

@@ -43,7 +43,7 @@ class ContactForm
 
                 global $wpdb;
                 $table_prifix = $wpdb->prefix;
-                $table_name = $table_prifix . 'bk_contact_form';
+                $table_name = BK_CONTACT_TABLE_NAME;
                 $status_msg_arr = array();
 
 

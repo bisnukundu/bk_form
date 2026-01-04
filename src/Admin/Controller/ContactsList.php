@@ -69,7 +69,7 @@ class ContactsList extends WP_List_Table
     function get_table_data()
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'bk_contact_form';
+        $table_name = BK_CONTACT_TABLE_NAME;
 
         //Pagination Start     
         // Calculate pagination details

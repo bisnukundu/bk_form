@@ -36,7 +36,7 @@ class ContactMenu
 
 
 
-        $contact_table = $wpdb->prefix . 'bk_contact_form';
+        $contact_table = BK_CONTACT_TABLE_NAME;;
 
         $query_to_get_single_contact = "SELECT * FROM $contact_table WHERE name=%s LIMIT %d";
 
@@ -142,7 +142,7 @@ class ContactMenu
 
         if ($current_action) {
             global $wpdb;
-            $table_name = $wpdb->prefix . 'bk_contact_form';
+            $table_name = BK_CONTACT_TABLE_NAME;
             $contact_ids = isset($_REQUEST['contact_ids']) ? array_map('intval', $_REQUEST['contact_ids']) : array();
             $query_placeholder = implode(", ", array_fill(0, count($contact_ids), '%d'));
             switch ($current_action) {

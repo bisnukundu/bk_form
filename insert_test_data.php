@@ -22,7 +22,8 @@ function insert_test_data()
 {
     global $wpdb;
 
-    $table_name = $wpdb->prefix . 'bk_contact_form';
+    
+    $table_name = BK_CONTACT_TABLE_NAME;
 
     // Sample data sets
     $names = [

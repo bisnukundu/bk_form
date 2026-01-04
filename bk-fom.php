@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 if (!defined('BK_CONTACT_TABLE_NAME')) {
     global $wpdb;
     $tableName = $wpdb->prefix . "bk_contact_form";
-    
+
     define("BK_CONTACT_TABLE_NAME", $tableName);
 }
 

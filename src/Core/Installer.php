@@ -10,7 +10,7 @@ class Installer
     function __construct()
     {
         global $wpdb;
-        $this->tableName = $wpdb->prefix . "bk_contact_form";
+        $this->tableName = BK_CONTACT_TABLE_NAME;
     }
 
     function create_table()
