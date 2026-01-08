@@ -24,4 +24,6 @@ trait Helper
             echo '</div>';
         }
     }
+
+    
 }

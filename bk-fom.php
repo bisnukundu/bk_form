@@ -40,15 +40,27 @@ use BkForm\Frontend\Controller\ContactForm;
 
 
 register_activation_hook(__FILE__, function () {
-
     $installer = new Installer();
     $installer->create_table();
+
+
+
+    // Add rewrite rule: match 'view-contact/anything/' and map it to the query var
+    add_rewrite_rule(
+        '^view-contact/([^/]+)/?$', // Regex pattern: matches 'view-contact/', captures slug, optional trailing slash
+        'index.php?view_contact_slug=$matches[1]', // Query string to use internally
+        'top' // Priority
+    );
+
+    flush_rewrite_rules(); // Refresh the parmalinks;
+
 });
 
 register_deactivation_hook(__FILE__, function () {
 
     // $installer = new Installer();
     // $installer->delete_table();
+    flush_rewrite_rules();
 });
 
 class Starter
@@ -56,7 +68,6 @@ class Starter
 
     function __construct()
     {
-
         add_action('init', [$this, 'init']);
     }
 
