@@ -8,7 +8,8 @@ class ContactForm
     {
         add_action('show_bk_form', [$this, 'show_bk_form_fn_for_shortcode']);
         add_shortcode("bk_contact_form", [$this, 'show_bk_form_fn_for_shortcode']);
-        add_action('wp_loaded', [$this, 'form_process']);
+        // add_action('wp_loaded', [$this, 'form_process']);
+        add_action('wp_ajax_bk_form_aj', [$this, 'ajax_test']);
     }
 
     function show_bk_form_fn_for_shortcode()
@@ -20,7 +21,45 @@ class ContactForm
         include(BK_FORM_PATH . '/src/Frontend/View/contactFormMarkup.php');
         return ob_get_clean();
     }
-    
+
+    function ajax_test()
+    {
+
+
+        if (!wp_verify_nonce($_POST['bk_ct_form_nonce'], 'bk_contact_form')) {
+            print "Sorry, Your nonce is invalid";
+            exit;
+        } else {
+            $name = sanitize_text_field($_POST['name'] ?? '');
+            $email = sanitize_email($_POST['email'] ?? '');
+            $subject = sanitize_text_field($_POST['subject'] ?? '');
+            $message = sanitize_textarea_field($_POST['message'] ?? '');
+
+            $data_arr = array(
+                'name' => $name,
+                'email' => $email,
+                'subject' => $subject,
+                'message' => $message
+            );
+
+            global $wpdb;
+            $table_prifix = $wpdb->prefix;
+            $table_name = BK_CONTACT_TABLE_NAME;
+
+            if (!empty($name) && !empty($email) && !empty($subject) && !empty($message)) {
+                $contact_insert = $wpdb->insert($table_name, $data_arr);
+                wp_send_json_success($contact_insert);
+            } else {
+
+
+                wp_send_json_error(['bk_form_status' => "all field required"]);
+            }
+
+
+        }
+
+    }
+
     function form_process()
     {
 

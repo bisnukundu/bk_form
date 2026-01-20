@@ -69,6 +69,7 @@ class Starter
     function __construct()
     {
         add_action('init', [$this, 'init']);
+
     }
 
     function init()
@@ -79,6 +80,10 @@ class Starter
     function enqueue_scripts()
     {
         wp_enqueue_script('tailwind-css-bk', 'https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4', [], time());
+        wp_enqueue_script('bk-contact-js', BK_FORM_URL . "src/assets/js/bk-contact.js", [], time(), true);
+        wp_localize_script('bk-contact-js', 'bk_js', [
+            'ajax_url' => admin_url('admin-ajax.php'),
+        ]);
     }
 }
 
