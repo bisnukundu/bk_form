@@ -9,7 +9,7 @@ class ContactForm
         add_action('show_bk_form', [$this, 'show_bk_form_fn_for_shortcode']);
         add_shortcode("bk_contact_form", [$this, 'show_bk_form_fn_for_shortcode']);
         // add_action('wp_loaded', [$this, 'form_process']);
-        add_action('wp_ajax_bk_form_aj', [$this, 'ajax_test']);
+        add_action('wp_ajax_bk_form_aj', [$this, 'ajax_form_process']);
     }
 
     function show_bk_form_fn_for_shortcode()
@@ -22,7 +22,7 @@ class ContactForm
         return ob_get_clean();
     }
 
-    function ajax_test()
+    function ajax_form_process()
     {
 
 
@@ -60,6 +60,7 @@ class ContactForm
 
     }
 
+    // PHP Form Processing ( this form_process method is not using currently)
     function form_process()
     {
 
